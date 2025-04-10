@@ -1,0 +1,7 @@
+# Ignore ambientes virtuais
+venv/
+.env
+
+# Outros comuns em projetos Python
+__pycache__/
+*.pyc
