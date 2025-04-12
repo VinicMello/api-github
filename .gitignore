@@ -2,6 +2,3 @@
 venv/
 .env
 
-# Outros comuns em projetos Python
-__pycache__/
-*.pyc
