@@ -5,6 +5,7 @@ import pandas as pd
 from datetime import datetime
 
 # Environment Variables
+DIR = os.getcwd()
 TOKEN_GITHUB = os.getenv("GITHUB_TOKEN")
 API_GITHUB_URL = os.getenv("API_GITHUB_URL")
 
@@ -19,6 +20,7 @@ class Dados:
         self.headers = {'Authorization': 'Bearer ' + self.token,
                         'X-GitHub-Api-Version': '2022-11-28'}
         self._overview_data = self._get_overview_data() 
+        self.base_save_path = os.path.join(DIR, 'src', 'data')
 
     def _check_api_status(self, url):
         """
@@ -53,8 +55,13 @@ class Dados:
     def collect_and_build_df_overview(self):
         """
         """
-        overview_df = pd.DataFrame([self._overview_data]) 
-        return overview_df
+        try:
+            overview_df = pd.DataFrame([self._overview_data]) 
+            overview_df = self.add_column_processing_date(overview_df) 
+            return overview_df
+
+        except Exception as error:
+            raise error
 
     def collect_repositories_and_build_df(self):
         """
@@ -86,6 +93,7 @@ class Dados:
                     for rep in response.json():
                         repos_data.append({
                         "created_at": rep.get("created_at"),
+                        "id_owner": rep.get("owner", {}).get("id"),
                         "name": rep.get("name"),
                         "full_name": rep.get("full_name"),
                         "description": rep.get("description"),
@@ -95,27 +103,46 @@ class Dados:
                     })
 
             # Cria o DataFrame com os dados coletados    
-            df_repos = pd.DataFrame(repos_data)                
+            df_repos = pd.DataFrame(repos_data) 
+            df_repos = self.add_column_processing_date(df_repos)               
             return df_repos
         
         except Exception as error:
             raise error
     
+    @staticmethod
     def add_column_processing_date(df):
         """
         """
-        df['processing_date'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-        return df
+        try:
+            df['processing_date'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            return df
+    
+        except Exception as error:
+            raise error
+    
+    def save_df(self, df, filename):
+        """
+        """
+        try:
+            # Verifica se o diretório existe
+            os.makedirs(self.base_save_path, exist_ok=True)
 
-# Main Cód.
-my_rep = Dados("Netflix")
+            # Cria o caminho completo
+            save_path = os.path.join(self.base_save_path, f'{filename}', f'{self.owner}.json')
+            
+            # Remove o arquivo existente
+            os.remove(save_path) if os.path.exists(save_path) else print()
 
-df = my_rep.collect_repositories_and_build_df()
-overview_df = my_rep.collect_and_build_df_overview()
+            # Salva o DataFrame
+            df.to_json(save_path)
+
+        except Exception as error:
+            raise error
 
 
 
-print()
+
 
 
 
