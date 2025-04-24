@@ -4,7 +4,6 @@ import pandas as pd
 from typing import Dict, Any
 from datetime import datetime
 
-# Environment Variables
 DIR = os.getcwd()
 TOKEN_GITHUB = os.getenv("GITHUB_TOKEN")
 API_GITHUB_URL = os.getenv("API_GITHUB_URL")

@@ -37,18 +37,18 @@ def main() -> None:
     
     for user in users_github:
         try:
-            logging.info(f"Iniciando coleta para o usuário: {user}")
+            logging.info(f"Starting collection for user: {user}")
             user_github = Extract(owner=user)
             
-            logging.info("Coletando...")
+            logging.info("Extracting...")
             df_overview = user_github.collect_and_build_df_overview()
             df_repositories = user_github.collect_repositories_and_build_df()
 
-            logging.info("Salvando...")
+            logging.info("Saving...")
             user_github.save_df(df=df_overview, filename='overview')
             user_github.save_df(df=df_repositories, filename='repositories')
 
-            logging.info(f"Processamento finalizado...")
+            logging.info(f"Process Finished...")
             time.sleep(1)
 
         except Exception as error:
